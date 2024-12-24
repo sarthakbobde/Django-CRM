@@ -44,7 +44,8 @@
                   <h8 class="card-title">{{ customer_record.phone }}</h8>
                   <p class="card-text">{{ customer_record.city }} {{ customer_record.state }}</p>
                   <a href="{% url 'home' %}" class="btn btn-primary">View All</a>
-                  <a href="{% url 'home' %}" class="btn btn-primary <!--position-absolute bottom-0 end-0 m-2-->">View All</a>
+                  <a href="{% url 'update_record' customer_record.id %}" class="btn btn-dark" > Update </a>
+                  <a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger <!--position-absolute bottom-0 end-0 m-2-->">Delete</a>
                 </div>
               </div>
         {% endif %}
