@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, AddRecordForm
 from django.contrib import messages
 from .models import Record
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 def home(request):
@@ -82,4 +84,35 @@ def add_record(request):
 def update_record(request, pk):
     record = Record.objects.get(id=pk)
     form = AddRecordForm(request.POST or None, instance=record)
-    return render(request, 'add_record.html', {'form':form})
+    if request.user.is_authenticated:
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Record Has Been Updated!")
+            return redirect('home')
+        return render(request, 'update_record.html', {'form':form})
+    else:
+        messages.success(request, "You Must Be Logged In")
+        return redirect('home')
+    
+def search_record(request):
+    if request.method == 'GET':
+        query = request.GET.get('q')
+        records = Record.objects.all()
+        if request.user.is_authenticated:
+            if query:
+            #records = Record.objects.all().filter(first_name=query)
+                records = records.filter(
+                    first_name__icontains=query
+                ) | records.filter(
+                    last_name__icontains = query
+                )  | records.filter(
+                    email__icontains = query
+                )  | records.filter(
+                    phone__icontains = query
+                )
+            else:
+                records = Record.objects.all()
+            return render(request, 'home.html', {'records':records})
+        else:
+            messages.success(request, "You Must Be Logged In")
+            return redirect('home')
